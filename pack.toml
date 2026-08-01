@@ -3,6 +3,11 @@ type = "local"
 path = "."
 ipkg = "idris2-Logic.ipkg"
 
+[custom.all.idris2-Boole]
+type = "local"
+path = "."
+ipkg = "idris2-Boole.ipkg"
+
 [custom.all.idris2-Multiset]
 type = "local"
 path = "../idris2-Multiset"
@@ -12,6 +17,11 @@ ipkg = "idris2-Multiset.ipkg"
 type = "local"
 path = "."
 ipkg = "idris2-Logic-test.ipkg"
+
+[custom.all.idris2-Boole-test]
+type = "local"
+path = "."
+ipkg = "idris2-Boole-test.ipkg"
 
 [custom.all.idris2-QuickCheck]
 type = "local"

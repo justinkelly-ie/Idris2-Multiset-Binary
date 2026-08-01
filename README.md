@@ -1,6 +1,6 @@
 # 🎛️ idris2-Boole
 
-**A formalization of Norman Wildberger's *Algebra of Boole* in [Idris 2](https://github.com/idris-lang/Idris2).**
+**A formalization of George Boole's and Norman Wildberger's *Algebra of Boole* using Multiset Algebra in [Idris 2](https://github.com/idris-lang/Idris2).**
 
 [![Idris2](https://img.shields.io/badge/Idris2-Algebra-blue.svg)](https://github.com/idris-lang/Idris2)
 
@@ -8,77 +8,91 @@
 
 ## 🏛️ The Algebraic Nature of the Algebra of Boole
 
-Wildberger's **Algebra of Boole** (originating from George Boole's original 1847 work *The Mathematical Analysis of Logic*) is a system of **mod-2 arithmetic**, not symbolic logic. It differs fundamentally from Huntington and Shannon's modern *Boolean Algebra* by treating exclusive-or (XOR) as the primitive addition operator.
+Wildberger's **Algebra of Boole** (originating from George Boole's 1847 foundation *The Mathematical Analysis of Logic*) is a system of **modulo-2 ring arithmetic** ($\mathbb{F}_2$), not symbolic logic. It differs fundamentally from Huntington and Shannon's modern *Boolean Algebra* by treating exclusive-or (XOR) as the primitive addition operator.
 
-### The Fundamental Shift: Self-Annihilation and Inverse
+### The Fundamental Shift: Self-Annihilation and Multiset Representation
 
-In standard Boolean algebra, addition is inclusive OR ($\lor$). Because $1 \lor 1 = 1$, the elements lack an additive inverse. You cannot subtract, and standard tools of linear algebra are unusable.
+In standard Boolean algebra, addition is inclusive OR ($\lor$). Because $1 \lor 1 = 1$, elements lack an additive inverse—subtraction is impossible, and linear algebra techniques cannot be applied.
 
-In the Algebra of Boole, addition is modulo-2 XOR ($+$). Because **$x + x = 0$**, every element is its own additive inverse. This simple property turns the system into a **Boolean Ring** (a commutative ring with identity where every element is idempotent, $x^2 = x$):
+In the Algebra of Boole, addition is modulo-2 XOR ($+$). Because **$x + x = 0$**, every element is its own additive inverse. This property establishes a **Boolean Ring** (a commutative ring with identity where every element is idempotent, $x^2 = x$).
 
-| Property | Algebra of Boole ($B_2$ Commutative Ring) | Boolean Algebra (Distributive Lattice) |
+Rather than relying on primitive/native Idris 2 data types or custom boolean flags, this library implements all Boole expressions using **multisets** (`Multiset Bit state` / `Multiset Bit Nat` from `idris2-Multiset`). Term addition is multiset addition followed by modulo-2 term annihilation (`addMultiset` + `annihilateMultiset`), meaning duplicate terms naturally cancel out to $\emptyset$.
+
+| Property | Algebra of Boole ($\mathbb{F}_2$ Commutative Ring) | Boolean Algebra (Distributive Lattice) |
 |---|---|---|
 | **Addition ($+$)** | `+` (XOR / Exclusive OR) | `∨` (OR / Inclusive OR) |
 | **Multiplication ($\cdot$)** | `*` (AND) | `∧` (AND) |
-| **Annihilation** | $1 + 1 = 0$ | $1 \lor 1 = 1$ |
-| **Additive Inverse** | Yes (each element is its own inverse: $x + x = 0$) | No |
-| **Subtraction** | Fully supported ($x - y \equiv x + y$) | Not defined |
+| **Annihilation** | $1 + 1 = 0$ (Multiset term annihilation) | $1 \lor 1 = 1$ |
+| **Additive Inverse** | Yes ($x + x = 0$) | No |
+| **Subtraction** | Supported ($x - y \equiv x + y$) | Not defined |
 | **Complement (NOT $x$)** | $1 + x$ (algebraically derived) | $\bar{x}$ (primitive connective) |
 | **Inclusive OR ($x \lor y$)** | $x + y + xy$ (algebraically derived) | $x \lor y$ (primitive connective) |
-| **Representation** | **Unique** multilinear polynomial (Boole polynumber) | Non-unique sum-of-products |
-| **Equivalence** | Direct coefficient vector comparison | SAT problem (NP-complete) |
+| **Representation** | **Unique** multilinear polynomial (Boole polynumber multiset) | Non-unique sum-of-products |
+| **Equivalence** | Direct multiset / coefficient vector comparison | SAT problem (NP-complete) |
 
 ---
 
-## 🗃️ Core Algebraic Architecture
+## 🗃️ Core Multiset Architecture
 
-This library implements the Algebra of Boole as the foundational layer (**Row 1**) of the **Global Finite Science Table**. All elements are modeled as fractional structures of multisets to enable smooth functorial transitions to higher physics and probability layers:
+All operations in `idris2-Boole` are implemented over multiset structures:
 
-$$\text{BooleFraction} = \frac{\text{Numerator Box} \;\in \mathbb{F}_2}{\text{Denominator Box} \;\in \mathbb{F}_2} \quad \text{where} \quad \text{Denominator} = \{1 \cdot [\text{Base}]\}$$
+$$\text{BoolePolynumber} = \text{Multiset Bit Nat}$$
 
-### The Three Core Types
+### Key Data Structures
 
-#### 1. `F2` — Wildberger's Bi-Field ([BF2.idr](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/BF2.idr))
-The coefficient field $B_2 = \{0, 1\}$. It is implemented as a strict, non-castable algebraic type `data F2 = Z | O` with a `Num` instance defining addition mod 2 ($O + O = Z$) and multiplication ($O * O = O$).
+#### 1. `Bit` (`Math.Singleton.Bit`)
+The coefficient field $\mathbb{F}_2 = \{0, 1\}$. Addition (`addBit`) is modulo-2 XOR, and multiplication (`mulBit`) is logical AND.
 
-#### 2. `BitGateMset` — The Numerator Box ([BitGate.idr](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/BitGate.idr))
-A multiset over a state type with `F2` coefficients. Because coefficients are in $F_2$, state addition automatically simplifies via XOR: inserting duplicate states cancels them out ($s + s = 0$). This acts as a coordinate vector representing a circuit's active states.
+#### 2. `BoolePolynumber` ([Logic.BoolePolynumber](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/BoolePolynumber.idr))
+A multiset `Multiset Bit Nat` where each entry `(k, One)` represents a product term with subset index $k$.
+- **Addition**: `addBoolePoly p q = annihilateMultiset (addMultiset p q)`. Duplicate terms cancel automatically ($1 + 1 = 0$).
+- **Multiplication**: `mulBoolePoly` applies Wildberger's idempotent rule ($x^2 = x$) via bitwise OR of subset indices ($a_k \cdot a_l = a_{k | l}$).
 
-#### 3. `BooleFraction` — The Complete Row 1 Type ([BooleFraction.idr](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/BooleFraction.idr))
-A fractional container `BooleFraction state` holding:
-- `numeratorBitMset`: The active circuit multiset weights.
-- `denominatorUnit`: The unit scale multiset.
-- `isTrivial`: A **dependent type proof** verifying at compile-time that the denominator is exactly the unit constant $1$. This anchors the denominator, which generalizes to the total universe sum in Row 3 (probability) and grid density in Rows 7–9 (chromogeometry).
+#### 3. `Circuit` ([Logic.Circuit](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/Circuit.idr))
+Aliased directly to `BoolePolynumber`. Circuit logic gates evaluate natively as multiset polynomials without AST tree traversal:
+- $\text{NOT}(a) = 1 + a$
+- $\text{OR}(a, b) = a + b + ab$
+- $\text{NAND}(a, b) = 1 + ab$
+- $\text{NOR}(a, b) = 1 + a + b + ab$
+- $P \to Q = 1 + P + PQ$
+
+#### 4. `LiftedPolynumber` & `LiftedBooleFraction` ([Logic.LiftedPolynumber](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/LiftedPolynumber.idr))
+Extends Row 1 $\mathbb{F}_2$ logic into Row 2 $\mathbb{Z}$ integer arithmetic. Monomials are multisets `Monomial v = Multiset BoxInt v` closed under $x^2 = x$ via `idempotentCollapse`. `LiftedBooleFraction` embeds an integer-weighted singleton numerator over a strictly positive unit denominator (`Sing TrivialBase`).
+
+#### 5. `ProbBounds` & Hailperin Bounds ([Logic.MobiusTransform](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/MobiusTransform.idr))
+Row 4 probability interval bounds $[lo, hi]$ derived directly from Möbius-inverted coefficients using inclusion-exclusion principles (including `threeEventUnionBounds` for George Boole's last challenge problem).
 
 ---
 
-## 🔄 Algebraic Transforms
+## 🔄 Algebraic Transforms & Bridges
 
-### Unique Boole Polynumbers
-Every logical function has a unique polynomial form (polynumber). For $n$ inputs, a function is represented as a vector of $2^n$ coefficients in $B_2$. Two logic circuits are equivalent if and only if their unique polynumber coefficients match exactly, replacing NP-complete SAT solving with $O(1)$ coordinate comparison.
+### The Boole-Möbius Transform ([Logic.MobiusTransform](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/MobiusTransform.idr))
+A self-inverse linear transform ($T^2 = I$ over $\mathbb{F}_2$) mapping a function's truth table to its unique `BoolePolynumber` coefficients.
 
-### The Boole-Möbius Transform ([MobiusTransform.idr](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/MobiusTransform.idr))
-A self-inverse linear transform ($T^2 = I$) that maps a function's truth table to its unique Boole polynumber coefficients. 
+### Integer Möbius Transform ([Logic.Bridge](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/Bridge.idr))
+Connects Row 1 ($\mathbb{F}_2$) to Row 2 ($\mathbb{Z}$) via `bitsToBoxInts`, `booleToIntPoly`, `mobiusTransformZ`, and `mobiusInverseZ`.
 
-### Row 1 → Row 2 Progression Bridge ([BooleFraction.idr](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/BooleFraction.idr))
-The function `liftToRow2` lifts a `BooleFraction` (with mod-2 $F_2$ coefficients) to a Row 2 integer multiset (with algebraic `BoxInt` coefficients). This maps the digital logic layer directly to the integer polynumber layer, ready for the Möbius shift.
+### Ongoing Sequences ([Logic.OnCircuit](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/OnCircuit.idr))
+Supports dynamic finitist sequence streams (`OnCircuit`, `OnByte`, `OnTruthTable`) for unbounded expanding circuit evaluations and pointwise Möbius transforms.
 
 ---
 
 ## 📁 Module Organization
 
-| Module | Role |
+All modules are located under `Logic.*`:
+
+| Module | Description |
 |---|---|
-| [Boole.BF2](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/BF2.idr) | Bi-field $B_2$ arithmetic, XOR addition, AND multiplication, `Num` instance. |
-| [Boole.BitGate](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/BitGate.idr) | Bit-gate multisets, coordinate evaluation, and `BoxInt` lifting. |
-| [Boole.BooleFraction](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/BooleFraction.idr) | The `BooleFraction` type, compile-time triviality proof, and Row 2 bridge. |
-| [Boole.MobiusTransform](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/MobiusTransform.idr) | The self-inverse Boole-Möbius transform ($T^2 = I$). |
-| [Boole.Polynumber](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/Polynumber.idr) | Multilinear polynumber algebra, evaluation, multiplication, and equivalence checks. |
-| [Boole.Circuit](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/Circuit.idr) | Circuit AST representation, primitive/derived gate translation, and complexity counting. |
-| [Boole.Bit](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/Bit.idr) | Dependent witness linear types for B₂ values. |
-| [Boole.Byte](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/Byte.idr) | B₂ⁿ vector coordinate spaces. |
-| [Boole.Syllogism](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/Syllogism.idr) | Classical syllogistic logic (Barbara, Celarent, Ferio) evaluated algebraically. |
-| [Boole.Interfaces](file:///var/home/justin/Projects/Idris2-Boole/src/Boole/Interfaces.idr) | Linear logic interfaces (`LConsumable`, `LComonoid`, `LEq`). |
+| [Logic.BoolePolynumber](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/BoolePolynumber.idr) | `BoolePolynumber` multiset type (`Multiset Bit Nat`), sparse/dense conversion, XOR addition, idempotent multiplication, evaluation, and equivalence checks. |
+| [Logic.BooleFunction](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/BooleFunction.idr) | `BooleFunction` truth table record, evaluation, and isomorphism with `BoolePolynumber`. |
+| [Logic.MobiusTransform](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/MobiusTransform.idr) | Self-inverse Boole-Möbius transform ($T^2 = I$), Hailperin probability bounds (`ProbBounds`), Boole-Fréchet bounds, George Boole's last challenge problem, and `OnSeq` sequence integration. |
+| [Logic.LiftedPolynumber](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/LiftedPolynumber.idr) | Row 2 multiset polynomials over $\mathbb{Z}$, monomial `idempotentCollapse`, `LiftedBooleFraction`, and standard `Num`/`Neg`/`Cast` instances. |
+| [Logic.Bridge](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/Bridge.idr) | Bit $\to$ BoxInt embedding, `booleToIntPoly`, forward and inverse integer Möbius transforms (`mobiusTransformZ` & `mobiusInverseZ`). |
+| [Logic.Circuit](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/Circuit.idr) | `Circuit` type alias to `BoolePolynumber`, pure algebraic gate definitions, and lifting to `IntPolynumber`. |
+| [Logic.OnCircuit](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/OnCircuit.idr) | Finitist ongoing sequences (`OnCircuit`, `ClipCircuit`, `OnByte`). |
+| [Logic.FunctionalProbability](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/FunctionalProbability.idr) | Hehner functional probability normalization (`MSetFractionVexel`, `stateProbability`, `normalizeFraction`). |
+| [Logic.Syllogism](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/Syllogism.idr) | Classical Aristotelian syllogisms (Barbara, Celarent, Darii, Ferio, Cesare, Camestres) and Stoic inference rules evaluated algebraically over multisets. |
+| [Logic.Interfaces](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/Interfaces.idr) | Conversions (`bitsToIntegers`, `integersToBits`) and linear vector helper utilities. |
 
 ---
 
@@ -105,6 +119,8 @@ depends = base, contrib, linear, idris2-Multiset, idris2-Boole
 
 - **Norman J. Wildberger**: *Algebra of Boole* (Mathematical Foundations Lectures 255–280).
 - **George Boole (1847)**: *The Mathematical Analysis of Logic*.
+- **Theodore Hailperin (1986)**: *Boole's Logic and Probability*.
+- **Eric Hehner**: *a Probability Theory*.
 
 ---
 

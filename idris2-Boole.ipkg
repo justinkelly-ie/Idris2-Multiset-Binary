@@ -6,17 +6,12 @@ depends = base, contrib, linear, idris2-Multiset
 
 sourcedir = "src"
 
-modules = Boole.Bit, Boole.Byte
-        , Boole.Polynumber, Boole.MobiusTransform
-        , Boole.Circuit, Boole.Syllogism
-        , Boole.Interfaces
-        , Boole.Bridge
-        , Boole.FunctionalProbability
-        , Boole.BF2
-        , Boole.LiftedPolynumber
-        , Boole.SingFraction
-        , Boole.Transformation
-        , Boole.SBFMset
-        , Boole.OnCircuit
-        , Boole.BooleFunction
+modules = Logic.BoolePolynumber, Logic.MobiusTransform
+        , Logic.Circuit, Logic.Syllogism
+        , Logic.Interfaces
+        , Logic.Bridge
+        , Logic.FunctionalProbability
+        , Logic.LiftedPolynumber
+        , Logic.OnCircuit
+        , Logic.BooleFunction
 
