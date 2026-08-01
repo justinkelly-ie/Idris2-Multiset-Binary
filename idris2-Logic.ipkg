@@ -2,7 +2,7 @@ package idris2-Logic
 version = 0.1.1
 authors = "Justin"
 
-depends = base, contrib, linear, idris2-Multiset
+depends = base, linear, idris2-Multiset
 
 sourcedir = "src"
 

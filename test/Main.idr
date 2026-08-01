@@ -65,54 +65,76 @@ Arbitrary MSetFraction where
     coarbitrary n (coarbitrary d gen)
 
 --------------------------------------------------------------------------------
--- 2. PROPERTIES FOR CORE TYPES
+-- 2. DEFINITION TESTS: B₂ ALGEBRAIC FIELD AXIOMS
 --------------------------------------------------------------------------------
 
--- Bit Properties
+||| Bit Addition is commutative: x + y = y + x
 prop_bitAddCommutative : Property
 prop_bitAddCommutative = forAll {a = (TestBit, TestBit)} {prop = Bool} arbitrary (MkFn (\(MkTestBit x, MkTestBit y) =>
-  Prelude.(+) x y == Prelude.(+) y x))
+  (x + y) == (y + x)))
 
+||| Bit Zero is the additive identity: x + 0 = x
 prop_bitAddIdentity : Property
 prop_bitAddIdentity = forAll {a = TestBit} {prop = Bool} arbitrary (MkFn (\(MkTestBit x) =>
-  Prelude.(+) x Zero == x))
+  (x + Zero) == x))
 
+||| Bit self-annihilation (XOR in B₂): x + x = 0
 prop_bitAddSelfAnnihilate : Property
 prop_bitAddSelfAnnihilate = forAll {a = TestBit} {prop = Bool} arbitrary (MkFn (\(MkTestBit x) =>
-  Prelude.(+) x x == Zero))
+  (x + x) == Zero))
 
+||| Bit Multiplication is commutative: x * y = y * x
 prop_bitMulCommutative : Property
 prop_bitMulCommutative = forAll {a = (TestBit, TestBit)} {prop = Bool} arbitrary (MkFn (\(MkTestBit x, MkTestBit y) =>
-  Prelude.(*) x y == Prelude.(*) y x))
+  (x * y) == (y * x)))
 
-prop_bitAddSelfAnnihilateZeroS : Property
-prop_bitAddSelfAnnihilateZeroS = forAll {a = TestBit} {prop = Bool} arbitrary (MkFn (\(MkTestBit x) =>
-  Prelude.(+) x x == Zero))
+||| Bit One is multiplicative identity: x * 1 = x
+prop_bitMulIdentity : Property
+prop_bitMulIdentity = forAll {a = TestBit} {prop = Bool} arbitrary (MkFn (\(MkTestBit x) =>
+  (x * One) == x))
 
--- Byte Properties
+||| Bit Zero annihilates under multiplication: x * 0 = 0
+prop_bitMulZeroAnnihilates : Property
+prop_bitMulZeroAnnihilates = forAll {a = TestBit} {prop = Bool} arbitrary (MkFn (\(MkTestBit x) =>
+  (x * Zero) == Zero))
+
+||| Bit Multiplication is idempotent: x * x = x
+prop_bitMulIdempotent : Property
+prop_bitMulIdempotent = forAll {a = TestBit} {prop = Bool} arbitrary (MkFn (\(MkTestBit x) =>
+  (x * x) == x))
+
+||| Bit Distributivity: x * (y + z) = (x * y) + (x * z)
+prop_bitDistributive : Property
+prop_bitDistributive = forAll {a = (TestBit, TestBit, TestBit)} {prop = Bool} arbitrary (MkFn (\(MkTestBit x, MkTestBit y, MkTestBit z) =>
+  (x * (y + z)) == ((x * y) + (x * z))))
+
+--------------------------------------------------------------------------------
+-- 3. PROPERTY TESTS: CIRCUITS, MOBIUS & BOOLE FUNCTIONS
+--------------------------------------------------------------------------------
+
+||| Byte self-addition annihilates: byte + byte = ZeroM
 prop_byteAddSelfAnnihilate : Property
 prop_byteAddSelfAnnihilate = forAll {a = List Nat} {prop = Bool} arbitrary (MkFn (\xs =>
   let byte = oneByte xs
   in addByte byte byte == ZeroM))
 
--- Circuit / Polynumber Properties
+||| Circuit NOT-NOT identity: 1 + (1 + c) = c
 prop_circuitNotNotIdentity : Property
 prop_circuitNotNotIdentity = forAll {a = List Bool} {prop = Bool} arbitrary (MkFn (\inputsBool =>
   let inputs = map (\b => if b then One else Zero) inputsBool
       circ = Var 0
       notNot = 1 + (1 + circ)
-      -- Ensure we have at least one input variable
       paddedInputs = if null inputs then [Zero] else inputs
   in evalBoolePoly notNot paddedInputs == evalBoolePoly circ paddedInputs))
 
--- Mobius Transform Properties
+||| Möbius Transform is an involution: M(M(v)) = v
 prop_mobiusSelfInverse : Property
 prop_mobiusSelfInverse = forAll {a = List Bool} {prop = Property} arbitrary (MkFn (\bools =>
   not (null bools) ==>
   let vals = map (\b => if b then One else Zero) (take 4 bools)
   in mobiusTransform (mobiusTransform vals) == vals))
 
--- SBFMset Properties
+||| Metric SBF Evaluation Invariant
 prop_sbfEvaluation : Property
 prop_sbfEvaluation = forAll {a = List Nat} {prop = Bool} arbitrary (MkFn (\xs =>
   let mset = fromList (map (\v => (v, 1)) xs)
@@ -120,7 +142,7 @@ prop_sbfEvaluation = forAll {a = List Nat} {prop = Bool} arbitrary (MkFn (\xs =>
       redVal = evalSBFMset redSBF mset
   in True))
 
--- Syllogism Properties
+||| Syllogism Barbara rule holds for arbitrary bytes
 prop_syllogismBarbara : Property
 prop_syllogismBarbara = forAll {a = List Nat} {prop = Bool} arbitrary (MkFn (\xs =>
   let a = oneByte xs
@@ -128,7 +150,7 @@ prop_syllogismBarbara = forAll {a = List Nat} {prop = Bool} arbitrary (MkFn (\xs
       c = oneByte xs
   in barbara a b c == True))
 
--- LiftedPolynumber Properties
+||| Monomial idempotent collapse reduces higher powers to exponent 1
 prop_idempotentCollapseMonomial : Property
 prop_idempotentCollapseMonomial = forAll {a = List Nat} {prop = Bool} arbitrary (MkFn (\vars =>
   let mono = fromList (map (\v => (v, 2)) vars)
@@ -136,7 +158,7 @@ prop_idempotentCollapseMonomial = forAll {a = List Nat} {prop = Bool} arbitrary 
       entries = multisetToList collapsed
   in all (\(_, c) => c == 1) entries))
 
--- BooleFunction Properties
+||| BooleFunction evaluation correctness against truth table indexing
 prop_booleFunctionEvaluation : Property
 prop_booleFunctionEvaluation = forAll {a = List Bool} {prop = Bool} arbitrary (MkFn (\bools =>
   let tableBool = take 4 (bools ++ replicate 4 False)
@@ -151,6 +173,7 @@ prop_booleFunctionEvaluation = forAll {a = List Bool} {prop = Bool} arbitrary (M
      (evaluate func in2 == fromMaybe Zero (lookupIndex 2 vals)) &&
      (evaluate func in3 == fromMaybe Zero (lookupIndex 3 vals))))
 
+||| BooleFunction and BoolePolynumber Isomorphism
 prop_booleFunctionPolynumberIsomorphism : Property
 prop_booleFunctionPolynumberIsomorphism = forAll {a = List Bool} {prop = Bool} arbitrary (MkFn (\bools =>
   let tableBool = take 4 (bools ++ replicate 4 False)
@@ -158,7 +181,7 @@ prop_booleFunctionPolynumberIsomorphism = forAll {a = List Bool} {prop = Bool} a
       func = MkBooleFunction 2 vals
   in truthTable (fromPolynumber 2 (toPolynumber func)) == vals))
 
--- Galadh Chooses Stone (polynumber isomorphism)
+||| Sir Galahad's Deduction / Stone Representation Duality Isomorphism
 prop_galadhadChoosesStone : Property
 prop_galadhadChoosesStone = forAll {a = List Bool} {prop = Bool} arbitrary (MkFn (\bools =>
   let tableBool = take 4 (bools ++ replicate 4 False)
@@ -167,7 +190,7 @@ prop_galadhadChoosesStone = forAll {a = List Bool} {prop = Bool} arbitrary (MkFn
   in truthTable (fromPolynumber 2 (toPolynumber func)) == vals))
 
 --------------------------------------------------------------------------------
--- 3. TEST SUITE RUNNER
+-- 4. TEST SUITE RUNNER
 --------------------------------------------------------------------------------
 
 partial
@@ -179,53 +202,61 @@ runSuite = do
   putStrLn "----------------------------------------------------"
   putStrLn ""
 
-  let r1 = quickCheck prop_bitAddCommutative
+  let r1  = quickCheck prop_bitAddCommutative
   putStrLn $ "prop_bitAddCommutative: " ++ r1.msg
 
-  let r2 = quickCheck prop_bitAddIdentity
+  let r2  = quickCheck prop_bitAddIdentity
   putStrLn $ "prop_bitAddIdentity: " ++ r2.msg
 
-  let r3 = quickCheck prop_bitAddSelfAnnihilate
+  let r3  = quickCheck prop_bitAddSelfAnnihilate
   putStrLn $ "prop_bitAddSelfAnnihilate: " ++ r3.msg
 
-  let r4 = quickCheck prop_bitMulCommutative
+  let r4  = quickCheck prop_bitMulCommutative
   putStrLn $ "prop_bitMulCommutative: " ++ r4.msg
 
-  let r5 = quickCheck prop_bitAddSelfAnnihilateZeroS
-  putStrLn $ "prop_bitAddSelfAnnihilateZeroS: " ++ r5.msg
+  let r5  = quickCheck prop_bitMulIdentity
+  putStrLn $ "prop_bitMulIdentity: " ++ r5.msg
 
-  let r6 = quickCheck prop_byteAddSelfAnnihilate
-  putStrLn $ "prop_byteAddSelfAnnihilate: " ++ r6.msg
+  let r6  = quickCheck prop_bitMulZeroAnnihilates
+  putStrLn $ "prop_bitMulZeroAnnihilates: " ++ r6.msg
 
-  let r7 = quickCheck prop_circuitNotNotIdentity
-  putStrLn $ "prop_circuitNotNotIdentity: " ++ r7.msg
+  let r7  = quickCheck prop_bitMulIdempotent
+  putStrLn $ "prop_bitMulIdempotent: " ++ r7.msg
 
-  let r8 = quickCheck prop_mobiusSelfInverse
-  putStrLn $ "prop_mobiusSelfInverse: " ++ r8.msg
+  let r8  = quickCheck prop_bitDistributive
+  putStrLn $ "prop_bitDistributive: " ++ r8.msg
 
-  let r9 = quickCheck prop_sbfEvaluation
-  putStrLn $ "prop_sbfEvaluation: " ++ r9.msg
+  let r9  = quickCheck prop_byteAddSelfAnnihilate
+  putStrLn $ "prop_byteAddSelfAnnihilate: " ++ r9.msg
 
-  let r10 = quickCheck prop_syllogismBarbara
-  putStrLn $ "prop_syllogismBarbara: " ++ r10.msg
+  let r10 = quickCheck prop_circuitNotNotIdentity
+  putStrLn $ "prop_circuitNotNotIdentity: " ++ r10.msg
 
-  let r11 = quickCheck prop_idempotentCollapseMonomial
-  putStrLn $ "prop_idempotentCollapseMonomial: " ++ r11.msg
+  let r11 = quickCheck prop_mobiusSelfInverse
+  putStrLn $ "prop_mobiusSelfInverse: " ++ r11.msg
 
-  let r12 = quickCheck prop_booleFunctionEvaluation
-  putStrLn $ "prop_booleFunctionEvaluation: " ++ r12.msg
+  let r12 = quickCheck prop_sbfEvaluation
+  putStrLn $ "prop_sbfEvaluation: " ++ r12.msg
 
-  let r13 = quickCheck prop_booleFunctionPolynumberIsomorphism
-  putStrLn $ "prop_booleFunctionPolynumberIsomorphism: " ++ r13.msg
+  let r13 = quickCheck prop_syllogismBarbara
+  putStrLn $ "prop_syllogismBarbara: " ++ r13.msg
 
-  let r14 = quickCheck prop_galadhadChoosesStone
-  putStrLn $ "prop_galadhadChoosesStone: " ++ r14.msg
+  let r14 = quickCheck prop_idempotentCollapseMonomial
+  putStrLn $ "prop_idempotentCollapseMonomial: " ++ r14.msg
 
-  -- Crash on failure to signal CI runner
-  let results = [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14]
+  let r15 = quickCheck prop_booleFunctionEvaluation
+  putStrLn $ "prop_booleFunctionEvaluation: " ++ r15.msg
+
+  let r16 = quickCheck prop_booleFunctionPolynumberIsomorphism
+  putStrLn $ "prop_booleFunctionPolynumberIsomorphism: " ++ r16.msg
+
+  let r17 = quickCheck prop_galadhadChoosesStone
+  putStrLn $ "prop_galadhadChoosesStone: " ++ r17.msg
+
+  let results = [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15, r16, r17]
   let failures = filter (\r => isJust r.pass && fromMaybe True r.pass == False) results
   if null failures
-    then putStrLn "\nAll 14 tests passed."
+    then putStrLn "\nAll 17 Boolean Algebra tests passed."
     else idris_crash "❌ FAILURE: One or more properties failed verification."
 
 partial

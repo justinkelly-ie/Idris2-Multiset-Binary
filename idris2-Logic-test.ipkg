@@ -2,7 +2,7 @@ package idris2-Logic-test
 version = 0.1.1
 authors = "Justin"
 
-depends = base, contrib, idris2-QuickCheck, idris2-Multiset, idris2-Logic
+depends = base, idris2-QuickCheck, idris2-Multiset, idris2-Logic
 
 sourcedir = "test"
 
