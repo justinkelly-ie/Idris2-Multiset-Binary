@@ -1,5 +1,5 @@
 package idris2-Boole
-version = 0.1.1
+version = 0.1.2
 authors = "Justin"
 
 depends = base, linear, idris2-Multiset

@@ -89,7 +89,7 @@ normalizeFraction (OverMSFSpace m den) =
     go (AddM (MkSing x) w rest) tot =
       (x, MkMSF w tot) :: go rest tot
 
-||| Hehner 'For All' (∀) Quantifier on Vexel Space: returns the minimum state weight.
+||| Hehner Minimum / 'For All' (∀) Quantifier on Vexel Space: returns the minimum state weight.
 public export
 minWeight : Ord w => Vexel w v -> Maybe w
 minWeight ZeroM = Nothing
@@ -98,7 +98,7 @@ minWeight (AddM _ w rest) =
     Nothing => Just w
     Just minRest => Just (if w < minRest then w else minRest)
 
-||| Hehner 'There Exists' (∃) Quantifier on Vexel Space: returns the maximum state weight.
+||| Hehner Maximum / 'There Exists' (∃) Quantifier on Vexel Space: returns the maximum state weight.
 public export
 maxWeight : Ord w => Vexel w v -> Maybe w
 maxWeight ZeroM = Nothing
@@ -242,7 +242,7 @@ expectation f (OverMSFSpace m den) =
 -- HEHNER CALCULATIONAL QUANTIFIERS (FOR ALL & THERE EXISTS)
 -----------------------------------------------------------------------
 
-||| Hehner Calculational 'For All' Quantifier: ∀⟨x : S · f(x)⟩ = min_{x ∈ S} f(x)
+||| Hehner Calculational 'For All' (∀) Quantifier over functions: forAll f domain
 public export
 forAll : Ord w => (v -> w) -> List v -> Maybe w
 forAll _ [] = Nothing
@@ -252,7 +252,7 @@ forAll f (x :: xs) =
        Nothing => Just val
        Just minRest => Just (if val < minRest then val else minRest)
 
-||| Hehner Calculational 'There Exists' Quantifier: ∃⟨x : S · f(x)⟩ = max_{x ∈ S} f(x)
+||| Hehner Calculational 'There Exists' (∃) Quantifier over functions: thereExists f domain
 public export
 thereExists : Ord w => (v -> w) -> List v -> Maybe w
 thereExists _ [] = Nothing
@@ -261,3 +261,13 @@ thereExists f (x :: xs) =
   in case thereExists f xs of
        Nothing => Just val
        Just maxRest => Just (if val > maxRest then val else maxRest)
+
+||| Alias synonym for minimum over functions
+public export
+minFn : Ord w => (v -> w) -> List v -> Maybe w
+minFn = forAll
+
+||| Alias synonym for maximum over functions
+public export
+maxFn : Ord w => (v -> w) -> List v -> Maybe w
+maxFn = thereExists
