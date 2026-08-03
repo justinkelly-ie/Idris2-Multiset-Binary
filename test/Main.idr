@@ -198,7 +198,7 @@ runSuite : IO ()
 runSuite = do
   putStrLn ""
   putStrLn "----------------------------------------------------"
-  putStrLn "-- idris2-Logic: Boolean Algebra Verification Suite --"
+  putStrLn "-- idris2-Boole: Boolean Algebra Verification Suite --"
   putStrLn "----------------------------------------------------"
   putStrLn ""
 
