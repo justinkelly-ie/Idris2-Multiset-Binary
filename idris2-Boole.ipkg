@@ -14,4 +14,5 @@ modules = Logic.BoolePolynumber, Logic.MobiusTransform
         , Logic.LiftedPolynumber
         , Logic.OnCircuit
         , Logic.BooleFunction
+        , Logic.InformationTheory
 

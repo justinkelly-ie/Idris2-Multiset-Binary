@@ -21,6 +21,7 @@ import Logic.LiftedPolynumber
 import Logic.BooleFunction
 import Math.Vexel.Byte
 import Math.Vexel.Transformation
+import Logic.InformationTheory
 
 %default total
 
@@ -253,10 +254,19 @@ runSuite = do
   let r17 = quickCheck prop_galadhadChoosesStone
   putStrLn $ "prop_galadhadChoosesStone: " ++ r17.msg
 
-  let results = [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15, r16, r17]
+  let r18 = quickCheck (property prop_klDivergenceZeroSelfModel)
+  putStrLn $ "prop_klDivergenceZeroSelfModel: " ++ r18.msg
+
+  let r19 = quickCheck (property prop_selfInformationNonNegative)
+  putStrLn $ "prop_selfInformationNonNegative: " ++ r19.msg
+
+  let r20 = quickCheck (property prop_compressionRatioPositive)
+  putStrLn $ "prop_compressionRatioPositive: " ++ r20.msg
+
+  let results = [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15, r16, r17, r18, r19, r20]
   let failures = filter (\r => isJust r.pass && fromMaybe True r.pass == False) results
   if null failures
-    then putStrLn "\nAll 17 Boolean Algebra tests passed."
+    then putStrLn "\nAll 20 Boolean Algebra & Information Theory tests passed."
     else idris_crash "❌ FAILURE: One or more properties failed verification."
 
 partial
