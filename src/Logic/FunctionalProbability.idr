@@ -89,17 +89,23 @@ normalizeFraction (OverMSFSpace m den) =
     go (AddM (MkSing x) w rest) tot =
       (x, MkMSF w tot) :: go rest tot
 
-||| Minimum weight in a Vexel.
+||| Hehner 'For All' (∀) Quantifier on Vexel Space: returns the minimum state weight.
 public export
-minWeight : Vexel BoxInt a -> BoxInt
-minWeight ZeroM = 0
-minWeight _  = 1
+minWeight : Ord w => Vexel w v -> Maybe w
+minWeight ZeroM = Nothing
+minWeight (AddM _ w rest) =
+  case minWeight rest of
+    Nothing => Just w
+    Just minRest => Just (if w < minRest then w else minRest)
 
-||| Maximum weight in a Vexel.
+||| Hehner 'There Exists' (∃) Quantifier on Vexel Space: returns the maximum state weight.
 public export
-maxWeight : Vexel BoxInt a -> BoxInt
-maxWeight ZeroM = 0
-maxWeight _  = 1
+maxWeight : Ord w => Vexel w v -> Maybe w
+maxWeight ZeroM = Nothing
+maxWeight (AddM _ w rest) =
+  case maxWeight rest of
+    Nothing => Just w
+    Just maxRest => Just (if w > maxRest then w else maxRest)
 
 ||| Check whether two elements have equal probability in a normalised space.
 public export
@@ -231,3 +237,27 @@ expectation f (OverMSFSpace m den) =
     sumWeighted _ ZeroM = 0
     sumWeighted fn (AddM (MkSing x) w rest) =
       (fn x * w) + sumWeighted fn rest
+
+-----------------------------------------------------------------------
+-- HEHNER CALCULATIONAL QUANTIFIERS (FOR ALL & THERE EXISTS)
+-----------------------------------------------------------------------
+
+||| Hehner Calculational 'For All' Quantifier: ∀⟨x : S · f(x)⟩ = min_{x ∈ S} f(x)
+public export
+forAll : Ord w => (v -> w) -> List v -> Maybe w
+forAll _ [] = Nothing
+forAll f (x :: xs) =
+  let val = f x
+  in case forAll f xs of
+       Nothing => Just val
+       Just minRest => Just (if val < minRest then val else minRest)
+
+||| Hehner Calculational 'There Exists' Quantifier: ∃⟨x : S · f(x)⟩ = max_{x ∈ S} f(x)
+public export
+thereExists : Ord w => (v -> w) -> List v -> Maybe w
+thereExists _ [] = Nothing
+thereExists f (x :: xs) =
+  let val = f x
+  in case thereExists f xs of
+       Nothing => Just val
+       Just maxRest => Just (if val > maxRest then val else maxRest)

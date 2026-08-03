@@ -22,8 +22,29 @@ import Logic.BooleFunction
 import Math.Vexel.Byte
 import Math.Vexel.Transformation
 import Logic.InformationTheory
+import Logic.FunctionalProbability
 
 %default total
+
+public export
+prop_hehnerMinMaxQuantifiers : Bool
+prop_hehnerMinMaxQuantifiers =
+  let vexelSpace : Vexel BoxInt Gender
+      vexelSpace = AddM (MkSing Boy) 3 (AddM (MkSing Girl) 5 ZeroM)
+      minW = minWeight vexelSpace
+      maxW = maxWeight vexelSpace
+  in minW == Just 3 && maxW == Just 5
+
+public export
+prop_hehnerFunctionQuantifiers : Bool
+prop_hehnerFunctionQuantifiers =
+  let domain = [Boy, Girl]
+      fn : Gender -> BoxInt
+      fn Boy = 10
+      fn Girl = 20
+      minVal = forAll fn domain
+      maxVal = thereExists fn domain
+  in minVal == Just 10 && maxVal == Just 20
 
 --------------------------------------------------------------------------------
 -- 1. ARBITRARY INSTANCES FOR CORE TYPES
@@ -269,10 +290,16 @@ runSuite = do
   let r22 = quickCheck (property prop_vexelKLDivergenceZero)
   putStrLn $ "prop_vexelKLDivergenceZero: " ++ r22.msg
 
-  let results = [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15, r16, r17, r18, r19, r20, r21, r22]
+  let r23 = quickCheck (property prop_hehnerMinMaxQuantifiers)
+  putStrLn $ "prop_hehnerMinMaxQuantifiers: " ++ r23.msg
+
+  let r24 = quickCheck (property prop_hehnerFunctionQuantifiers)
+  putStrLn $ "prop_hehnerFunctionQuantifiers: " ++ r24.msg
+
+  let results = [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15, r16, r17, r18, r19, r20, r21, r22, r23, r24]
   let failures = filter (\r => isJust r.pass && fromMaybe True r.pass == False) results
   if null failures
-    then putStrLn "\nAll 22 Boolean Algebra & Information Theory tests passed."
+    then putStrLn "\nAll 24 Boolean Algebra & Information Theory tests passed."
     else idris_crash "❌ FAILURE: One or more properties failed verification."
 
 partial
