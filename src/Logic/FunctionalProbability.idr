@@ -201,3 +201,33 @@ observedRedSide = mkMSetFractionVexel (AddM (MkSing (CardRR, RedSide)) 2 ZeroM) 
 public export
 probOtherSideRed : MSetFraction
 probOtherSideRed = stateProbability observedRedSide (CardRR, RedSide)
+
+-----------------------------------------------------------------------
+-- HEHNER PROBABILITY FUNCTIONALS & EXPECTATION
+-----------------------------------------------------------------------
+
+||| Hehner's Normalization Operator ↕E = E / ∑E
+||| Converts an unnormalized multiset of state weights into a normalized MSetFractionVexel space.
+public export
+normalize : Vexel BoxInt v -> MSetFractionVexel v
+normalize v =
+  let tot = totalAbsMass v
+  in mkMSetFractionVexel v tot
+
+||| Expected Value Functional E[f] = ∑ f(x) · w_x / ∑ w
+||| Computes the exact weighted expectation of a payload function f over a normalized distribution space.
+public export
+expectation : Eq v => (v -> BoxInt) -> MSetFractionVexel v -> MSetFraction
+expectation f (OverMSFSpace m den) =
+  let (MkUr val) = boxToInt (totalMass m)
+      tot = cast val
+  in if tot == 0
+     then zeroMSF
+     else
+       let weightedSum = sumWeighted f m
+       in MkMSF weightedSum tot
+  where
+    sumWeighted : (v -> BoxInt) -> Vexel BoxInt v -> BoxInt
+    sumWeighted _ ZeroM = 0
+    sumWeighted fn (AddM (MkSing x) w rest) =
+      (fn x * w) + sumWeighted fn rest
