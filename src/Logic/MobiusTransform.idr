@@ -274,7 +274,7 @@ booleFrechetBoundsOnSeq = zipWith booleFrechetBounds
 ||| Pointwise Möbius bounds extraction from ongoing coefficients.
 public export
 extractBoundsFromMobiusOnSeq : OnSeq (List BoxInt) -> OnSeq (List ProbBounds)
-extractBoundsFromMobiusOnSeq = map extractBoundsFromMobius
+extractBoundsFromMobiusOnSeq = OnMSet.map extractBoundsFromMobius
 
 ||| Pointwise bounding of the union of three events.
 public export
