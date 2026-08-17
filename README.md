@@ -40,7 +40,7 @@ $$\text{BoolePolynumber} = \text{Multiset Bit Nat}$$
 
 ### Key Data Structures
 
-#### 1. `Bit` (`Math.Singleton.Bit`)
+#### 1. `Bit` (`Math.Unixel.Bit`)
 The coefficient field $\mathbb{F}_2 = \{0, 1\}$. Addition (`addBit`) is modulo-2 XOR, and multiplication (`mulBit`) is logical AND.
 
 #### 2. `BoolePolynumber` ([Logic.BoolePolynumber](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/BoolePolynumber.idr))
@@ -57,7 +57,7 @@ Aliased directly to `BoolePolynumber`. Circuit logic gates evaluate natively as 
 - $P \to Q = 1 + P + PQ$
 
 #### 4. `LiftedPolynumber` & `LiftedBooleFraction` ([Logic.LiftedPolynumber](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/LiftedPolynumber.idr))
-Extends Row 1 $\mathbb{F}_2$ logic into Row 2 $\mathbb{Z}$ integer arithmetic. Monomials are multisets `Monomial v = Multiset BoxInt v` closed under $x^2 = x$ via `idempotentCollapse`. `LiftedBooleFraction` embeds an integer-weighted singleton numerator over a strictly positive unit denominator (`Sing TrivialBase`).
+Extends Row 1 $\mathbb{F}_2$ logic into Row 2 $\mathbb{Z}$ integer arithmetic. Monomials are multisets `Monomial v = Multiset BoxInt v` closed under $x^2 = x$ via `idempotentCollapse`. `LiftedBooleFraction` embeds an integer-weighted unixel numerator over a strictly positive unit denominator (`Unixel TrivialBase`).
 
 #### 5. `ProbBounds` & Hailperin Bounds ([Logic.MobiusTransform](file:///var/home/justin/Projects/Idris2-Boole/src/Logic/MobiusTransform.idr))
 Row 4 probability interval bounds $[lo, hi]$ derived directly from Möbius-inverted coefficients using inclusion-exclusion principles (including `threeEventUnionBounds` for George Boole's last challenge problem).
