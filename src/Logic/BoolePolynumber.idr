@@ -3,8 +3,7 @@ module Logic.BoolePolynumber
 import Data.List
 import Data.Nat
 import Math.Multiset
-import Math.Singleton.Bit
-import Math.Vexel.Byte
+import public Math.Singleton.Bit
 import Math.BoxInt
 
 %default covering

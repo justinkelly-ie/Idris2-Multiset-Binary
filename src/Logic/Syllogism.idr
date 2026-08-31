@@ -2,11 +2,15 @@ module Logic.Syllogism
 
 import Data.Vect
 import Math.Singleton.Bit
-import Math.Vexel.Byte
 import Math.BoxInt
 import Math.Multiset
 
 %default total
+
+||| A Byte state vector: multiset over Bit coefficients.
+public export
+0 Byte : Type -> Type
+Byte state = Multiset Bit state
 
 -----------------------------------------------------------------------
 -- ARISTOTELIAN SYLLOGISMS VIA THE ALGEBRA OF BOOLE
@@ -33,6 +37,22 @@ SomeQisP   = 2
 public export
 SomeQnotP  : Predication
 SomeQnotP  = 3
+
+public export
+everyQisP : Eq state => Byte state -> Byte state -> Bool
+everyQisP q p = (annihilateMultiset (subMultiset q (scaleMultiset 1 q))) == ZeroM
+
+public export
+noQisP : Eq state => Byte state -> Byte state -> Bool
+noQisP q p = (annihilateMultiset (scaleMultiset 0 q)) == ZeroM
+
+public export
+someQisP : Eq state => Byte state -> Byte state -> Bool
+someQisP q p = not (noQisP q p)
+
+public export
+someQnotP : Eq state => Byte state -> Byte state -> Bool
+someQnotP q p = not (everyQisP q p)
 
 public export
 showPredication : Predication -> String

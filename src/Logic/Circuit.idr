@@ -2,7 +2,6 @@ module Logic.Circuit
 
 import Data.List
 import Math.Multiset
-import Math.IntPolynumber
 import Math.Singleton.Bit
 import public Logic.BoolePolynumber
 import Math.BoxInt
