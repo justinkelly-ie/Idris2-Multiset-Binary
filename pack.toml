@@ -1,4 +1,14 @@
 [package]
-name = "Idris2-Boole2"
-version = "0.1.0"
-ipkg = "Idris2-Boole2.ipkg"
+name = "Idris2-Multiset-Binary"
+version = "0.3.0"
+ipkg = "Idris2-Multiset-Binary.ipkg"
+
+[custom.all.Idris2-Multiset-Core]
+type = "local"
+path = "../Idris2-Multiset-Core"
+ipkg = "Idris2-Multiset-Core.ipkg"
+
+[custom.all.Idris2-Multiset-Transform]
+type = "local"
+path = "../Idris2-Multiset-Transform"
+ipkg = "Idris2-Multiset-Transform.ipkg"

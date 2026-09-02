@@ -1,0 +1,12 @@
+package Idris2-Multiset-Binary-test
+version = 0.1.1
+authors = "Justin"
+
+depends = base, idris2-QuickCheck, idris2-Multiset, Idris2-Multiset-Binary
+
+sourcedir = "test"
+
+main = Main
+executable = boole-test
+
+modules = Main

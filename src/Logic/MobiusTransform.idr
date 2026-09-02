@@ -32,7 +32,7 @@ mobiusTransform table =
     getAt (S k) (_ :: xs) = getAt k xs
     getAt _ [] = Zero
 
-||| Rational probability fraction alias to SingFraction from Idris2-Multiset1.
+||| Rational probability fraction alias to SingFraction from Idris2-Multiset-Transform.
 public export
 0 MSetFraction : Type
 MSetFraction = SingFraction

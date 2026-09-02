@@ -1,11 +1,11 @@
-package Idris2-Boole2
+package Idris2-Multiset-Binary
 version = 0.1.0
 authors = "Justin Kelly"
 brief   = "Layer 2a Constructivist B2 Field & Algebra of Boole Engine."
 
 depends = base
-        , Idris2-Multiset0
-        , Idris2-Multiset1
+        , Idris2-Multiset-Core
+        , Idris2-Multiset-Transform
 
 modules = Logic.BoolePolynumber
         , Logic.MobiusTransform

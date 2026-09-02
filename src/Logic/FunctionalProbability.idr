@@ -21,10 +21,10 @@ import Core.VexelMaxel
 --   P(x) = weight(x) / totalMass
 -----------------------------------------------------------------------
 
-||| Probability fraction alias.
+||| Deprecated type alias for UnixelFraction. Use UnixelFraction directly.
 public export
 0 MSetFraction : Type
-MSetFraction = SingFraction
+MSetFraction = UnixelFraction
 
 ||| Computes total weight sum over a Vexel state vector.
 public export
@@ -33,13 +33,13 @@ vexelTotalMass (MkVexel terms) = foldl (\acc, (_, w) => acc + w) 0 terms
 
 ||| Extract state probability from weight and total mass.
 public export
-stateProbability : BoxInt -> BoxInt -> SingFraction
+stateProbability : BoxInt -> BoxInt -> UnixelFraction
 stateProbability num den =
   mkUnixelFraction num (Math.Interfaces.integerToNat den.value)
 
 ||| Exact expectation of a payload function over a discrete Vexel.
 public export
-expectation : (Unixel -> BoxInt) -> Vexel -> SingFraction
+expectation : (Unixel -> BoxInt) -> Vexel -> UnixelFraction
 expectation f (MkVexel terms) =
   let weightedSum = foldl (\acc, (u, w) => acc + (f u * w)) 0 terms
       totMass = foldl (\acc, (_, w) => acc + w) 0 terms
