@@ -32,10 +32,10 @@ mobiusTransform table =
     getAt (S k) (_ :: xs) = getAt k xs
     getAt _ [] = Zero
 
-||| Rational probability fraction alias to SingFraction from Idris2-Multiset-Transform.
+||| Rational probability fraction alias to UnixelFraction from Idris2-Multiset-Transform.
 public export
 0 MSetFraction : Type
-MSetFraction = SingFraction
+MSetFraction = UnixelFraction
 
 ||| Is subset predicate for Nat binary encodings.
 public export
@@ -53,13 +53,13 @@ isSubsetNat i j = (i == (i `land` j))
 -- PROBABILITY BOUNDS (HAILPERIN / BOOLE)
 -----------------------------------------------------------------------
 
-||| A closed interval [lo, hi] of SingFractions.
+||| A closed interval [lo, hi] of UnixelFractions.
 ||| Represents the tightest possible bounds on an unknown probability.
 public export
 record ProbBounds where
   constructor MkBounds
-  lo : SingFraction
-  hi : SingFraction
+  lo : UnixelFraction
+  hi : UnixelFraction
 
 public export
 Show ProbBounds where
@@ -76,5 +76,5 @@ trivialBounds = MkBounds (mkUnixelFraction (CBox.intToBoxInt 0) 1) (mkUnixelFrac
 
 ||| An exact probability (degenerate interval where lo == hi).
 public export
-exactBounds : SingFraction -> ProbBounds
+exactBounds : UnixelFraction -> ProbBounds
 exactBounds p = MkBounds p p

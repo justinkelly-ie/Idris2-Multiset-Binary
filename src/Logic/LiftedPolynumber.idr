@@ -5,8 +5,6 @@ import Data.Nat
 import Math.Multiset
 import Math.Singleton.Sing
 import Math.BoxInt
-import Math.Singleton.Bit
-import Math.Singleton.SingFraction
 import Logic.Bridge
 import Logic.BoolePolynumber
 import Math.Vexel.Vexel

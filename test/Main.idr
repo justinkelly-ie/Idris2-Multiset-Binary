@@ -15,7 +15,6 @@ import Logic.BoolePolynumber
 import Logic.Circuit
 import Logic.MobiusTransform
 import Math.Singleton.SBFMset
-import Math.Singleton.SingFraction
 import Logic.Syllogism
 import Logic.LiftedPolynumber
 import Logic.BooleFunction
