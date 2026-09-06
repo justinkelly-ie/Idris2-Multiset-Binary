@@ -46,6 +46,25 @@ evaluate (MkBooleFunction arity table) inputs =
        Just val => val
        Nothing  => Zero
 
+||| Convert a BooleFunction's truth table directly to a Multiset Bit Nat.
+public export
+toMultiset : BooleFunction -> Multiset Bit Nat
+toMultiset (MkBooleFunction arity table) = denseToSparse table
+
+||| Construct a BooleFunction from a Multiset Bit Nat truth table representation.
+public export
+fromMultiset : (arity : Nat) -> Multiset Bit Nat -> BooleFunction
+fromMultiset arity m =
+  let table = sparseToDense (power 2 arity) m
+  in MkBooleFunction arity table
+
+||| Evaluate a BooleFunction using a Multiset Bit Nat input assignment.
+public export
+evaluateMultiset : BooleFunction -> Multiset Bit Nat -> Bit
+evaluateMultiset bf inputMs =
+  let inputs = sparseToDense (arity bf) inputMs
+  in evaluate bf inputs
+
 ||| Convert a BooleFunction to its unique algebraic BoolePolynumber representation.
 ||| This uses the Boole-Möbius transform to find the polynumber coefficients.
 public export

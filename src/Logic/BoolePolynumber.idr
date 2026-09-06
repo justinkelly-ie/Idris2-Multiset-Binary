@@ -182,6 +182,12 @@ public export
 polyEquiv : BoolePolynumber -> BoolePolynumber -> Bool
 polyEquiv p q = annihilateMultiset (addMultiset p q) == ZeroM
 
+||| Two polynumbers are equivalent iff their sum annihilates to zero (returning Bit).
+public export
+polyEquivBit : BoolePolynumber -> BoolePolynumber -> Bit
+polyEquivBit p q =
+  if annihilateMultiset (addMultiset p q) == ZeroM then One else Zero
+
 -----------------------------------------------------------------------
 -- DISPLAY
 -----------------------------------------------------------------------
