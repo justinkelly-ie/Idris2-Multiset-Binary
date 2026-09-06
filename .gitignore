@@ -1,3 +1,11 @@
+# Idris 2 Build Artifacts & Generated Code (Enforces Idris Language Classification on GitHub Linguist)
 build/
+.pack/
 *.ttc
 *.ttm
+*.so
+*.o
+*.c
+*.exec
+*.log
+
