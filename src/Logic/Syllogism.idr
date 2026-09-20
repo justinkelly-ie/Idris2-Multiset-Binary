@@ -38,18 +38,44 @@ public export
 SomeQnotP  : Predication
 SomeQnotP  = 3
 
+||| Helper to lookup the weight of a state coordinate in a Byte.
+public export
+lookupWeight : Eq state => state -> Byte state -> Bit
+lookupWeight _ ZeroM = Zero
+lookupWeight x (AddM y w rest) =
+  if x == y then w + lookupWeight x rest else lookupWeight x rest
+
+||| Pointwise multiplication (AND) of two Boole vectors.
+public export
+mulByte : Eq state => Byte state -> Byte state -> Byte state
+mulByte ZeroM _ = ZeroM
+mulByte (AddM x w1 xs) ys =
+  let w2 = lookupWeight x ys
+      prod = w1 * w2
+  in if isZero prod
+       then mulByte xs ys
+       else AddM x prod (mulByte xs ys)
+
+||| Every Q is a P: Every active coordinate in Q is active in P.
 public export
 everyQisP : Eq state => Byte state -> Byte state -> Bool
-everyQisP q p = (annihilateMultiset (subMultiset q (scaleMultiset 1 q))) == ZeroM
+everyQisP ZeroM _ = True
+everyQisP (AddM x w xs) ys =
+  (isZero w || isOne (lookupWeight x ys)) && everyQisP xs ys
 
+||| No Q is a P: Q · P = 0.
 public export
 noQisP : Eq state => Byte state -> Byte state -> Bool
-noQisP q p = (annihilateMultiset (scaleMultiset 0 q)) == ZeroM
+noQisP q p = case mulByte q p of
+  ZeroM => True
+  _     => False
 
+||| Some Q is a P: Q · P ≠ 0.
 public export
 someQisP : Eq state => Byte state -> Byte state -> Bool
 someQisP q p = not (noQisP q p)
 
+||| Some Q is not a P: Some active coordinate in Q is not active in P.
 public export
 someQnotP : Eq state => Byte state -> Byte state -> Bool
 someQnotP q p = not (everyQisP q p)
