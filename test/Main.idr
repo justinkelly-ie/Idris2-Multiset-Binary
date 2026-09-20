@@ -8,7 +8,7 @@ import Math.Pixel
 import Math.BoxInt
 import Math.SignedFraction
 import Math.Interfaces
-import Math.Vexel.Vexel
+import Core.VexelMaxel
 import Math.Vexel.DepVexel
 import Math.Singleton.Bit
 import Logic.BoolePolynumber

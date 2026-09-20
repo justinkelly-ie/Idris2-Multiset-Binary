@@ -27,6 +27,11 @@ log2Ceil n =
   let half = cast {to=Nat} (div (cast {to=Integer} (S n)) 2)
   in S (assert_total (log2Ceil half))
 
+||| Log2 helper for BoxInt.
+public export
+boxLog2 : BoxInt -> BoxInt
+boxLog2 b = intToBoxInt (cast (log2Ceil (boxToNat b)))
+
 ||| Native BoxInt Self-Information (Surprisal) for an exact rational probability fraction w/d:
 ||| I(x) = log2(1 / P(x)) = boxLog2(denom) - boxLog2(abs(num))
 public export
@@ -34,15 +39,15 @@ selfInformationBoxInt : MSetFraction -> BoxInt
 selfInformationBoxInt (MkMSF num denom) =
   let dBox = intToBoxInt (cast denom)
       iDenom = boxLog2 dBox
-      iNum = boxLog2 (boxAbs num)
-      (MkUr n) = boxToInt num
+      iNum = boxLog2 (absBox num)
+      n = unwrapBox num
   in if n == 0 then 0 else iDenom - iNum
 
 ||| Self-Information (Surprisal) in bits for an exact rational probability fraction w/d
 public export
 selfInformationBits : MSetFraction -> Nat
 selfInformationBits sf =
-  let (MkUr val) = boxToInt (selfInformationBoxInt sf)
+  let val = unwrapBox (selfInformationBoxInt sf)
   in cast val
 
 ||| Cross-Entropy H(P, Q) in bits for discrete multiset distributions.
@@ -124,7 +129,7 @@ prop_compressionRatioPositive =
 public export
 prop_expectationConstant : Bool
 prop_expectationConstant =
-  let space = normalize (AddM (MkSing Boy) 3 (AddM (MkSing Girl) 5 ZeroM))
+  let space = normalize (AddM Boy 3 (AddM Girl 5 ZeroM))
       expVal = expectation (\_ => 10) space
   in expVal == MkMSF 80 8
 
@@ -132,5 +137,5 @@ prop_expectationConstant =
 public export
 prop_vexelKLDivergenceZero : Bool
 prop_vexelKLDivergenceZero =
-  let space = normalize (AddM (MkSing Boy) 1 (AddM (MkSing Girl) 3 ZeroM))
+  let space = normalize (AddM Boy 1 (AddM Girl 3 ZeroM))
   in vexelKLDivergence [Boy, Girl] space space == 0

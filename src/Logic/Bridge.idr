@@ -4,6 +4,7 @@ import Math.Multiset
 import Math.BoxInt
 import Math.Singleton.Sing
 import Math.Singleton.Bit
+import public Math.IntPolynumber
 import Logic.BoolePolynumber
 import Logic.MobiusTransform
 
@@ -15,11 +16,6 @@ import Logic.MobiusTransform
 -- Row 1 (Digital Repetition) operates over Bit ∈ {0,1} (𝔽₂).
 -- Row 2 (Lifted Polynumbers) operates over BoxInt ∈ ℤ.
 -----------------------------------------------------------------------
-
-||| An integer-coefficient multiset polynomial over 2D variable powers.
-public export
-IntPolynumber : Type
-IntPolynumber = Multiset BoxInt (Nat, Nat)
 
 ||| Embed a Bit list (truth table or coefficient vector) into BoxInt list.
 public export

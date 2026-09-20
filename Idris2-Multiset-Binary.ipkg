@@ -3,15 +3,18 @@ version = 0.1.0
 authors = "Justin Kelly"
 brief   = "Layer 2a Constructivist B2 Field & Algebra of Boole Engine."
 
-depends = base
-        , Idris2-Multiset-Core
-        , Idris2-Multiset-Transform
-
-modules = Logic.BoolePolynumber
-        , Logic.MobiusTransform
-        , Logic.Circuit
-        , Logic.Syllogism
-        , Logic.FunctionalProbability
-        , Logic.BooleFunction
-
+depends = Idris2-Multiset-Core, Idris2-Multiset-Transform, base, linear
 sourcedir = "src"
+
+modules = Logic.BooleFunction,
+          Logic.BoolePolynumber,
+          Logic.Bridge,
+          Logic.Circuit,
+          Logic.FunctionalProbability,
+          Logic.InformationTheory,
+          Logic.Interfaces,
+          Logic.LiftedPolynumber,
+          Logic.MobiusTransform,
+          Logic.OnCircuit,
+          Logic.Syllogism
+
