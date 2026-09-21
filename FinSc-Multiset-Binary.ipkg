@@ -1,9 +1,9 @@
-package Idris2-Multiset-Binary
+package FinSc-Multiset-Binary
 version = 0.1.0
 authors = "Justin Kelly"
 brief   = "Layer 2a Constructivist B2 Field & Algebra of Boole Engine."
 
-depends = Idris2-Multiset-Core, Idris2-Multiset-Transform, base, linear
+depends = FinSc-Multiset-Core, FinSc-Multiset-Transform, base, linear
 sourcedir = "src"
 
 modules = Binary,

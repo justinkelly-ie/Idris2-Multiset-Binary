@@ -1,14 +1,14 @@
 [package]
-name = "Idris2-Multiset-Binary"
+name = "FinSc-Multiset-Binary"
 version = "0.3.0"
-ipkg = "Idris2-Multiset-Binary.ipkg"
+ipkg = "FinSc-Multiset-Binary.ipkg"
 
-[custom.all.Idris2-Multiset-Core]
+[custom.all.FinSc-Multiset-Core]
 type = "local"
-path = "../Idris2-Multiset-Core"
-ipkg = "Idris2-Multiset-Core.ipkg"
+path = "../FinSc-Multiset-Core"
+ipkg = "FinSc-Multiset-Core.ipkg"
 
-[custom.all.Idris2-Multiset-Transform]
+[custom.all.FinSc-Multiset-Transform]
 type = "local"
-path = "../Idris2-Multiset-Transform"
-ipkg = "Idris2-Multiset-Transform.ipkg"
+path = "../FinSc-Multiset-Transform"
+ipkg = "FinSc-Multiset-Transform.ipkg"
